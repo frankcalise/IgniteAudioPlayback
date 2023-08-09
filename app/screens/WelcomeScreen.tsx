@@ -1,23 +1,38 @@
 import { observer } from "mobx-react-lite"
 import React, { FC } from "react"
 import { Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
-import {
-  Text,
-} from "app/components"
+import { Button, Text } from "app/components"
 import { isRTL } from "../i18n"
 import { AppStackScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
 import { useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
+import TrackPlayer, { Track, TrackType } from "react-native-track-player"
 
 const welcomeLogo = require("../../assets/images/logo.png")
 const welcomeFace = require("../../assets/images/welcome-face.png")
 
 interface WelcomeScreenProps extends AppStackScreenProps<"Welcome"> {}
 
-export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeScreen(
-) {
-
+export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeScreen() {
   const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
+
+  React.useEffect(() => {
+    async function setupPlayer() {
+      await TrackPlayer.setupPlayer()
+    }
+
+    setupPlayer()
+  }, [])
+
+  const handlePlayback = async () => {
+    const demoTrack: Track = {
+      url: "https://music.amazon.com/getSampleTrack/B07X66DCLM",
+      type: TrackType.HLS,
+    }
+
+    await TrackPlayer.add([demoTrack])
+    await TrackPlayer.play()
+  }
 
   return (
     <View style={$container}>
@@ -34,7 +49,7 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeSc
       </View>
 
       <View style={[$bottomContainer, $bottomContainerInsets]}>
-        <Text tx="welcomeScreen.postscript" size="md" />
+        <Button onPress={handlePlayback} text="Play Track" />
       </View>
     </View>
   )
